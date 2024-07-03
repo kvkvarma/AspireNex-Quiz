@@ -9,32 +9,47 @@ const CreateQuiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const number = location.state || 0;
-  const quizNumber = "quiz"+number.toString();
-  const [quiz,setQuiz] = useState([]);
-  const [quizno,setQuizno] = useState(null);
 
-  const getQuiz = async(callback)=>{
-    try{    
-        const {data,error} = await supabase.from("quiz").select('*').limit(10);
-        if(error) throw error;
-        if(data!=null){
-            setQuiz(data);
-            
-                callback(data[0].quizno);
-            
-        }
-    }
-    catch(error){
-        alert(error.message)
-    }
+  const[questionNo,setQuestionNo] = useState(1);
+  const value = "quiz" + number.toString();
+  const [quizNumber,setQuizNumber] = useState(value);
+  const [question,setQuestion] = useState('');
+  const[option1,setOption1] = useState('');
+  const[option2,setOption2] = useState('');
+  const[option3,setOption3] = useState('');
+  const[option4,setOption4] = useState('');
+  const[crtAnswer,setCrtAnswer] = useState('');
+
+const insertQuestion = async (e) => {
+  e.preventDefault();
+  try {
+    const { data, error } = await supabase
+      .from('quiz')
+      .insert({
+        quizno: quizNumber,
+        questionid: questionNo,
+        question: question,
+        opt1: option1,
+        opt2: option2,
+        opt3: option3,
+        opt4: option4,
+        crtanswer: crtAnswer,
+      })
+      .single();
+
+    if (error) throw error;
+  } catch (error) {
+   console.log(error)
   }
-const ans=((getNo)=>{
-    console.log(getNo);
-})
-
-  useEffect(()=>{
-    getQuiz(ans);//passing the callback function
-},[])
+  setQuestion('');
+  setOption1('');
+  setOption2('');
+  setOption3('');
+  setOption4('');
+  setCrtAnswer('');
+  let num = questionNo+1;
+  setQuestionNo(num)
+};
 
   return (
     <div className="bg-gray-700 flex items-center justify-center h-screen">
@@ -56,6 +71,8 @@ const ans=((getNo)=>{
               name="question"
               placeholder="Enter your question..."
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:shadow-md"
+              value={question}
+              onChange={(e)=>setQuestion(e.target.value)}
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -72,6 +89,8 @@ const ans=((getNo)=>{
                 name="option1"
                 placeholder="Option 1..."
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-slate-400"
+                value={option1}
+                onChange={(e)=>setOption1(e.target.value)}
               />
             </div>
             <div>
@@ -87,6 +106,8 @@ const ans=((getNo)=>{
                 name="option2"
                 placeholder="Option 2..."
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={option2}
+                onChange={(e)=>setOption2(e.target.value)}
               />
             </div>
             <div>
@@ -102,6 +123,8 @@ const ans=((getNo)=>{
                 name="option3"
                 placeholder="Option 3..."
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                value={option3}
+                onChange={(e)=>setOption3(e.target.value)}
               />
             </div>
             <div>
@@ -117,6 +140,8 @@ const ans=((getNo)=>{
                 name="option4"
                 placeholder="Option 4..."
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                onChange={(e)=>setOption4(e.target.value)}
+                value={option4}
               />
             </div>
           </div>
@@ -133,15 +158,25 @@ const ans=((getNo)=>{
               name="answer"
               placeholder="Enter the correct answer..."
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              onChange={(e)=>setCrtAnswer(e.target.value)}
+              value={crtAnswer}
             />
+          </div>  
+          <div className="flex justify-around">
+          <div>
+            <button onClick={insertQuestion}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Done
+            </button>
           </div>
-          <div className="flex justify-center">
-            <button
-              type="submit"
+          <div >
+            <button onClick={()=>{navigate('/',{state:{newId:321,newName:'sdssdvdadasa',newTopic:'sasadada'}})}}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Submit
             </button>
+          </div>
           </div>
           <div className="absolute top-4 right-4">
             <button
@@ -151,7 +186,6 @@ const ans=((getNo)=>{
               Exit
             </button>
 
-            {/* <button onClick={insertQuestion}>Next</button> */}
           </div>
         </form>
       </div>
