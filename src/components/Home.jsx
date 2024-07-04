@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { MdOutlineAdd } from 'react-icons/md';
+import { SyncLoader } from 'react-spinners';
 const Home = () => {
   const navigate = useNavigate();
-  const location = useLocation();
 
+  const [loader,setLoader] = useState(true);
   const [quizList, setQuizList] = useState([]);
   const getDistinctQuizzes = async()=>{
     try{
@@ -28,10 +29,25 @@ const Home = () => {
       console.log(error)
     }
   }
+
+  const editLoader = ()=>{
+    setTimeout(()=>{
+      setLoader(false);
+    },  1000)
+  }
   useEffect(()=>{
+    editLoader();
     getDistinctQuizzes();
   },[])
 
+  if(loader){
+    return(
+      <div className="min-h-screen flex justify-center items-center">
+      <SyncLoader color="#131842" size={20} />
+  </div>
+    )
+  }
+  else{
   return (
     <>
       
@@ -65,6 +81,7 @@ const Home = () => {
       ))}
     </>
   );
+}
 };
 
 export default Home;

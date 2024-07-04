@@ -2,14 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import {supabase} from "../supabaseClient"
-
-//w1pjBhkbvvAwIDmN
+import { SyncLoader } from "react-spinners";
 
 const CreateQuiz = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const number = location.state || 0;
-
+  let number = location.state || 0;
+  number = number+1;
   const[questionNo,setQuestionNo] = useState(1);
   const value = "quiz" + number.toString();
   const [quizNumber,setQuizNumber] = useState(value);
@@ -19,9 +18,12 @@ const CreateQuiz = () => {
   const[option3,setOption3] = useState('');
   const[option4,setOption4] = useState('');
   const[crtAnswer,setCrtAnswer] = useState('');
+  const [loader,setLoader] = useState(true);
 
 const insertQuestion = async (e) => {
-  e.preventDefault();
+  if(e)
+   e.preventDefault();
+  if(question!='' && option1!='' && option2!='' && option3!='' && option4!=''&& crtAnswer!=''){
   try {
     const { data, error } = await supabase
       .from('quiz')
@@ -41,6 +43,7 @@ const insertQuestion = async (e) => {
   } catch (error) {
    console.log(error)
   }
+}
   setQuestion('');
   setOption1('');
   setOption2('');
@@ -50,7 +53,27 @@ const insertQuestion = async (e) => {
   let num = questionNo+1;
   setQuestionNo(num)
 };
+const submitFired = ()=>{
+  insertQuestion();
+  navigate('/')
+}
+const editLoader= ()=>{
+  setTimeout(()=>{
+    setLoader(false);
+  },1000)
+}
+useEffect(()=>{
+  editLoader();
+})
 
+  if(loader){
+    return(
+      <div className="min-h-screen flex justify-center items-center">
+      <SyncLoader color="#131842" size={20} />
+    </div>
+    )
+  }
+  else{
   return (
     <div className="bg-gray-700 flex items-center justify-center h-screen">
       <div className="container mx-auto px-4">
@@ -66,6 +89,7 @@ const insertQuestion = async (e) => {
               Question
             </label>
             <input
+              required
               type="text"
               id="question"
               name="question"
@@ -84,6 +108,7 @@ const insertQuestion = async (e) => {
                 Option 1
               </label>
               <input
+              required
                 type="text"
                 id="option1"
                 name="option1"
@@ -101,6 +126,7 @@ const insertQuestion = async (e) => {
                 Option 2
               </label>
               <input
+                required
                 type="text"
                 id="option2"
                 name="option2"
@@ -118,6 +144,7 @@ const insertQuestion = async (e) => {
                 Option 3
               </label>
               <input
+                required
                 type="text"
                 id="option3"
                 name="option3"
@@ -135,6 +162,7 @@ const insertQuestion = async (e) => {
                 Option 4
               </label>
               <input
+                required
                 type="text"
                 id="option4"
                 name="option4"
@@ -152,7 +180,8 @@ const insertQuestion = async (e) => {
             >
               Answer
             </label>
-            <input
+            <input  
+              required
               type="text"
               id="answer"
               name="answer"
@@ -167,11 +196,11 @@ const insertQuestion = async (e) => {
             <button onClick={insertQuestion}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Done
+              Next
             </button>
           </div>
           <div >
-            <button onClick={()=>{navigate('/',{state:{newId:321,newName:'sdssdvdadasa',newTopic:'sasadada'}})}}
+            <button onClick={submitFired}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
               Submit
@@ -180,7 +209,7 @@ const insertQuestion = async (e) => {
           </div>
           <div className="absolute top-4 right-4">
             <button
-              onClick={() => navigate("/")}
+              onClick={() => {navigate("/")}}
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline lg:hover:scale-105"
             >
               Exit
@@ -191,6 +220,7 @@ const insertQuestion = async (e) => {
       </div>
     </div>
   );
+  }
 };
 
 export default CreateQuiz;
