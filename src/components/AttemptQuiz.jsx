@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation, useAsyncError } from "react-router-dom";
-import { supabase } from "./supabaseClient";
+import { useNavigate, useLocation } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 import { SyncLoader } from "react-spinners";
 
 const AttemptQuiz = () => {
+
+  const [minutes, setMinutes] = useState(30);
+  const [seconds, setSeconds] = useState(0);
+
   const location = useLocation();
-  const quizNo = location.state || "";
+  const quizNo = location.state || "";  
   const navigate = useNavigate();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -28,7 +32,7 @@ const AttemptQuiz = () => {
       const answer = answerArray.find((item) => item.id === currentQuestionIndex + 1);
       setSelectedAnswer(answer ? answer.selectedAnswer : "");
       setAnyOne(!answer);
-      if (currentQuestionIndex === questions.length - 2) {
+      if (currentQuestionIndex === questions.length-2) {
         setShowSubmit(true);
       }
     }
@@ -42,15 +46,13 @@ const AttemptQuiz = () => {
       setAnyOne(!answer);
       setShowSubmit(false);
     }
-  };
-
+  };  
   const result = () => {
     const updatedArray = questions.map((item) => ({
       id: item.questionid,
       correctAnswer: item.crtanswer,
     }));
     setCrtAnswerArray(updatedArray);
-    console.log(crtAnswerArray);
   };
 
   const getData = async () => {
@@ -70,6 +72,28 @@ const AttemptQuiz = () => {
     getData();
     editLoader();
   }, []);
+
+  useEffect(()=>{
+    const interval = setInterval(()=>{
+        setSeconds((prevSeconds)=>{
+        if(prevSeconds===0){
+          if(minutes===0){
+            navigate('/')
+            clearInterval(interval);
+            return 0;
+          }
+          else{
+            setMinutes((prevMinutes)=>prevMinutes-1);
+            return 59;
+          }
+        }
+        else{
+          return prevSeconds-1;
+        }
+      })
+    },1000);
+    return ()=>{clearInterval(interval)};
+  },[minutes])
 
   useEffect(() => {
     if (questions.length > 0) {
@@ -101,44 +125,49 @@ const AttemptQuiz = () => {
     }
   };
 
-  let cnt = 0;
-  const submitQuiz = (e) => {
-    for (let i = 0; i < questions.length; i++) {
+  let score = 0;
+  const submitQuiz = () => {
+    for (let i = 0; i < answerArray.length; i++) {
       if (
-        answerArray[i]?.selectedAnswer.trim() ===
-        crtAnswerArray[i]?.correctAnswer.trim()
+        answerArray[i]?.selectedAnswer.trim() === crtAnswerArray[i]?.correctAnswer.trim()
       ) {
-        cnt++;
+        score++;
       }
     }
-    console.log(cnt);
-    navigate('/')
+    navigate('/scorepage',{state:score})
+    setMinutes(100)
   };
   if(loader){
     return (
       <>
         <div className="min-h-screen flex justify-center items-center">
-          <SyncLoader color="#131842" size={20} />
+          <SyncLoader color="#6F459B" size={15} />
       </div>
       </>
     );
   }
   else{
   return (
-    <div className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center p-4">
+    <div className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 min-h-screen flex items-center justify-center pt-4 pl-4 pr-4 pb-[-2] bg-cover shadow-lg" style={{ backgroundImage: "url('/bgimage.jpg')" }}>
+     <div className=" absolute right-4 top-2 z-10 px-6 py-2 rounded-md font-bold  text-whit bg-defaultColor  text-white">
+      Timer - <span> </span>
+        {String(minutes).padStart(2, '0')}:
+        {String(seconds).padStart(2, '0')}
+      
+    </div>
       <div className="bg-white shadow-lg rounded-lg p-8 max-w-4xl w-full relative">
         {currentQuestion && (
           <div>
             <button
               onClick={() => navigate("/")}
-              className="absolute top-4 right-4 py-1 px-3 rounded-lg bg-red-500 text-white hover:bg-red-700 focus:outline-none"
+              className="absolute top-4 right-4 py-1 px-3 rounded-full text-black font-bold sm:hover:bg-red-700 sm:hover:text-white focus:outline-none"
             >
-              x
+              X
             </button>
-            <h1 className="text-3xl font-bold mb-6 text-center text-gray-800">
+            <h1 className="text-3xl font-bold mb-6 text-center text-defaultColor">
               Question {currentQuestionIndex + 1}
             </h1>
-            <p className="text-lg mb-6 text-gray-700">
+            <p className="text-lg mb-6 text-gray-700 font-semibold">
               {currentQuestion.question}
             </p>
 
@@ -193,8 +222,8 @@ const AttemptQuiz = () => {
             </div>
             <div className="flex justify-between">
               <button
-                onClick={handlePrev}
-                className={`${anyOne ? 'cursor-not-allowed' : 'cursor-pointer'}  bg-gray-800 text-white py-2 px-6 rounded-lg hover:bg-gray-900 focus:outline-none`}
+                onClick={handlePrev}  
+                className={`bg-gray-800 text-white py-2 px-6 rounded-lg sm:hover:bg-gray-900 focus:outline-none`}
               >
                 Prev
               </button>
@@ -205,7 +234,7 @@ const AttemptQuiz = () => {
 
                 className={`${
                   anyOne ? 'cursor-not-allowed' : 'cursor-pointer'
-                } bg-green-600 text-white py-4 px-6 rounded-lg hover:bg-green-700 focus:outline-none`}
+                } bg-green-600 text-white py-2 px-6 rounded-lg sm:hover:bg-green-700 focus:outline-none`}
               >
                 {showSubmit ? "Submit" : "Next"}
               </button>
