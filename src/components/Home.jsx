@@ -35,7 +35,7 @@ const Home = () => {
   const editLoader = () => {
     setTimeout(() => {
       setLoader(false);
-    }, 1000);
+    }, 1500);
   };
 
   useEffect(() => {
@@ -99,7 +99,7 @@ const Home = () => {
     <div className="w-full h-44 flex flex-col sm:flex-row sm:h-28 border border-defaultColor rounded-lg shadow-2xl p-4 sm:p-4 sm:justify-between sm:items-center bg-white transition duration-300 mb-2">
       <div>
         <div className="mt-1 text-lg font-bold text-purple-900">{quizno}</div>
-        <div className="mt-1 font-light text-hoverColor">Time: 30 min</div>
+        <div className="mt-1 font-light text-hoverColor">Time: 15 min</div>
       </div>
       <div className="mt-1 text-defaultColor justify-end font-semibold mb-1">{topic}</div>
       <button

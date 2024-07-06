@@ -4,7 +4,7 @@ import { supabase } from "../supabaseClient";
 import { SyncLoader } from "react-spinners";
 
 const AttemptQuiz = () => {
-  const [minutes, setMinutes] = useState(30);
+  const [minutes, setMinutes] = useState(15);
   const [seconds, setSeconds] = useState(0);
 
   const location = useLocation();
@@ -22,7 +22,7 @@ const AttemptQuiz = () => {
   const editLoader = () => {
     setTimeout(() => {
       setLoader(false);
-    }, 1000);
+    }, 1500);
   };
 
   const handleNext = () => {
