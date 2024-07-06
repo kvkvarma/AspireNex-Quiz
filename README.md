@@ -1,6 +1,6 @@
 #Quiz Website
 
-Live Link - {https://quiz-aspirenex.netlify.app/}
+[Live Link](https://quiz-aspirenex.netlify.app/)
 
 The website allows users to attempt various quizzes, create their own quizzes, and participate by submitting their own questions.
 
