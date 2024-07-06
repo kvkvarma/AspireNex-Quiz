@@ -75,6 +75,7 @@ const CreateQuiz = () => {
   const submitFired = async (e) => {
     setQuesNo(quesNo + 1);
     e.preventDefault();
+    navigate("/");
     const newQuestion = {
       quizNumber: capitalize(quizNumber),
       questionNo: questionNo,
@@ -118,7 +119,7 @@ const CreateQuiz = () => {
           console.log(error);
         }
       }
-      navigate("/");
+      
     };
 
   const editLoader = () => {
